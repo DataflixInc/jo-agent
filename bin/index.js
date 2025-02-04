@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const qa_agent_1 = __importDefault(require("./agents/qa-agent"));
+const analyzer_agent_1 = require("./agents/analyzer-agent");
 const technical_agent_1 = require("./agents/technical-agent");
 const score_calc_1 = require("./utils/score_calc");
 const scrapper_1 = require("./utils/scrapper");
@@ -37,13 +38,13 @@ app.post("/qa", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const isQualified = (0, score_calc_1.qualificationChecker)(qualificationResponses);
         if (isQualified) {
             const { jobDescription } = yield (0, scrapper_1.scrapper)(jdLink);
-            const result = yield (0, technical_agent_1.technicalQuestionnaireAgent)(jobDescription, qualificationResponses);
+            const formattedQuestionnaire = (0, score_calc_1.formattedQuestionnaireWithResponse)(qualificationResponses);
+            const analysis = yield (0, analyzer_agent_1.questionnaireResponseAnalyzerAgent)(jobDescription, formattedQuestionnaire);
+            const result = yield (0, technical_agent_1.technicalQuestionnaireAgent)(analysis.toString());
             res.send(result);
         }
         else {
-            res.send({
-                qualified: false,
-            });
+            res.send("Not Qualified");
         }
     }
 }));

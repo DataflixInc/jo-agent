@@ -6,51 +6,34 @@ const QuestionObjectWithResponse = QuestionObject.extend({
   response: z.string().describe("Response to the question"),
 });
 
-export const SelectedResponseFormat = ResponseFormatter.extend({
-  selected_necessary_requirements: z
-    .array(z.string())
-    .describe("List of selected necessary requirements"),
-  selected_preferred_requirements: z
-    .array(z.string())
-    .describe("List of selected preferred requirements"),
+export const QuestionnaireWithResponse = ResponseFormatter.extend({
+  questionnaire: z.object({
+    question1: QuestionObjectWithResponse,
+    question2: QuestionObjectWithResponse,
+    question3: QuestionObjectWithResponse,
+    question4: QuestionObjectWithResponse,
+    question5: QuestionObjectWithResponse,
+  }),
 });
 
-export type SelectedResponseFormatType = z.infer<typeof SelectedResponseFormat>;
+export type QuestionnaireWithResponseType = z.infer<
+  typeof QuestionnaireWithResponse
+>;
 
-export const qualificationChecker = (
-  selectedResponse: SelectedResponseFormatType
-) => {
-  // If the selected necessary requirements length is greater than 50% of the necessary requirements, return true
-  const necessaryRequirements = selectedResponse.necessary_requirements;
-  const selectedNecessaryRequirements =
-    selectedResponse.selected_necessary_requirements;
-  const necessaryRequirementsLength = necessaryRequirements.length;
-  const selectedNecessaryRequirementsLength =
-    selectedNecessaryRequirements.length;
-  const necessaryRequirementsPercentage = Math.floor(
-    (selectedNecessaryRequirementsLength / necessaryRequirementsLength) * 100
-  );
+export const qualificationChecker = ({
+  questionnaire,
+}: QuestionnaireWithResponseType) => {
+  let score = 0;
+  // calculate the score
+  Object.values(questionnaire).forEach((questionObject) => {
+    if (questionObject.answer === questionObject.response) {
+      score += 1;
+    }
+  });
 
-  // If the selected preferred requirements length is greater than 50% of the preferred requirements, return true
-  const preferredRequirements = selectedResponse.preferred_requirements;
-  const selectedPreferredRequirements =
-    selectedResponse.selected_preferred_requirements;
-  const preferredRequirementsLength = preferredRequirements.length;
-  const selectedPreferredRequirementsLength =
-    selectedPreferredRequirements.length;
-  const preferredRequirementsPercentage = Math.floor(
-    (selectedPreferredRequirementsLength / preferredRequirementsLength) * 100
-  );
-
-  // if both necessary and preferred requirements are greater than 50%, return true
-  if (
-    necessaryRequirementsPercentage >= 50 &&
-    preferredRequirementsPercentage >= 50
-  ) {
-    return true;
-  } else {
-    return false;
-  }
+  // if score percentage is greater than 70% return true
+  const isQualified = score / 5 > 0.7;
+  return isQualified;
 };
 
 export const FormattedQuestionObject = z.object({
@@ -59,3 +42,78 @@ export const FormattedQuestionObject = z.object({
   answer: z.string().describe("Answer to the question"),
   verdict: z.enum(["Correct", "Incorrect"]).describe("Verdict of the response"),
 });
+
+export const FormattedQuestionnaireWithVerdict = ResponseFormatter.extend({
+  questionnaire: z.object({
+    question1: FormattedQuestionObject,
+    question2: FormattedQuestionObject,
+    question3: FormattedQuestionObject,
+    question4: FormattedQuestionObject,
+    question5: FormattedQuestionObject,
+  }),
+});
+
+export type FormattedQuestionnaireWithVerdictType = z.infer<
+  typeof FormattedQuestionnaireWithVerdict
+>;
+
+export const formattedQuestionnaireWithResponse = ({
+  questionnaire,
+}: QuestionnaireWithResponseType): FormattedQuestionnaireWithVerdictType => {
+  const formattedQuestionnaire: FormattedQuestionnaireWithVerdictType = {
+    questionnaire: {
+      question1: {
+        question: questionnaire["question1"].question,
+        response: questionnaire["question1"].response,
+        answer: questionnaire["question1"].answer,
+        verdict:
+          questionnaire["question1"].response ===
+          questionnaire["question1"].answer
+            ? "Correct"
+            : "Incorrect",
+      },
+      question2: {
+        question: questionnaire["question2"].question,
+        response: questionnaire["question2"].response,
+        answer: questionnaire["question2"].answer,
+        verdict:
+          questionnaire["question2"].response ===
+          questionnaire["question2"].answer
+            ? "Correct"
+            : "Incorrect",
+      },
+      question3: {
+        question: questionnaire["question3"].question,
+        response: questionnaire["question3"].response,
+        answer: questionnaire["question3"].answer,
+        verdict:
+          questionnaire["question3"].response ===
+          questionnaire["question3"].answer
+            ? "Correct"
+            : "Incorrect",
+      },
+      question4: {
+        question: questionnaire["question4"].question,
+        response: questionnaire["question4"].response,
+        answer: questionnaire["question4"].answer,
+        verdict:
+          questionnaire["question4"].response ===
+          questionnaire["question4"].answer
+            ? "Correct"
+            : "Incorrect",
+      },
+      question5: {
+        question: questionnaire["question5"].question,
+        response: questionnaire["question5"].response,
+        answer: questionnaire["question5"].answer,
+        verdict:
+          questionnaire["question5"].response ===
+          questionnaire["question5"].answer
+            ? "Correct"
+            : "Incorrect",
+      },
+    },
+  };
+
+  return formattedQuestionnaire;
+};

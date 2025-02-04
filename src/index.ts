@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import qaAgent from "./agents/qa-agent";
 import { questionnaireResponseAnalyzerAgent } from "./agents/analyzer-agent";
 import { technicalQuestionnaireAgent } from "./agents/technical-agent";
-import { qualificationChecker } from "./utils/score_calc";
+import {
+  formattedQuestionnaireWithResponse,
+  qualificationChecker,
+} from "./utils/score_calc";
 
 import { scrapper } from "./utils/scrapper";
 dotenv.config();
@@ -30,15 +33,17 @@ app.post("/qa", async (req: Request, res: Response) => {
     const isQualified = qualificationChecker(qualificationResponses);
     if (isQualified) {
       const { jobDescription } = await scrapper(jdLink);
-      const result = await technicalQuestionnaireAgent(
-        jobDescription,
+      const formattedQuestionnaire = formattedQuestionnaireWithResponse(
         qualificationResponses
       );
+      const analysis = await questionnaireResponseAnalyzerAgent(
+        jobDescription,
+        formattedQuestionnaire
+      );
+      const result = await technicalQuestionnaireAgent(analysis.toString());
       res.send(result);
     } else {
-      res.send({
-        qualified: false,
-      });
+      res.send("Not Qualified");
     }
   }
 });

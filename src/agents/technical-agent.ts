@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { ChatOpenAI } from "@langchain/openai";
 import { SystemMessage } from "@langchain/core/messages";
-import { SelectedResponseFormatType } from "../utils/score_calc";
 
 const TechnicalQuestionObject = z.object({
   question: z
@@ -22,19 +21,11 @@ const ResponseFormatter = z.object({
       question3: TechnicalQuestionObject,
       question4: TechnicalQuestionObject,
       question5: TechnicalQuestionObject,
-      question6: TechnicalQuestionObject,
-      question7: TechnicalQuestionObject,
-      question8: TechnicalQuestionObject,
-      question9: TechnicalQuestionObject,
-      question10: TechnicalQuestionObject,
     })
     .describe("List of technical questions"),
 });
 
-export const technicalQuestionnaireAgent = async (
-  jd: string,
-  qualificationResponses: SelectedResponseFormatType
-) => {
+export const technicalQuestionnaireAgent = async (analysis: string) => {
   const model = new ChatOpenAI({
     model: "o1",
   }).withStructuredOutput(ResponseFormatter, {
@@ -42,26 +33,17 @@ export const technicalQuestionnaireAgent = async (
   });
 
   const SYSTEM_TEMPLATE = `
-  You are given a job description and applicants qualifications to create questionnaire.
-  Applicant selected a list of qualifications from a list of necessary and preferred requirements provided to the applicant for the job.
-  The questionnaire is to verify the skills of the applicant from the list of qualifications selected by the applicant.
-  The questionnaire should be multiple-choice questions with ONLY one correct answer.
+    You are given an analysis of the technical skills and qualification required for the job that an applicant is applying for.
+    You have the following tasks.
+        1. From the analysis, create a questionnaire that will help you understand the technical skills and qualification of the applicant.
+        2. The questionnaire should have multiple-choice questions with ONLY one correct answer.
+        3. The correct answer should be provided for each question.
+        4. The questionnaire should have only 5 questions.
+        5.  Do not add optoin A, B, C, D or 1, 2, 3, 4 to the options.
+        6. Every choice should be RELEVANT to the question.
 
-  You have the following tasks.
-    1. Analyze the job description.
-    2. Use the qualification list selected by the applicant to create a questionnaire.
-    3. Create a questionnaire that will help you understand the technical skills and qualification of the applicant.
-    4. The questionnaire should have multiple-choice questions with ONLY one correct answer.
-    5. The correct answer should be provided for each question.
-    6. The questionnaire should have only 10 questions.
-    7. Do not add optoin A, B, C, D or 1, 2, 3, 4 to the options.
-    8. Every choice should be RELEVANT to the question. 
-
-    Job Description: ${jd}
-
-    Selected Necessary Qualifications by Applicant: ${qualificationResponses.selected_necessary_requirements.toString()}
-    Selected Preferred Qualifications by Applicant: ${qualificationResponses.selected_preferred_requirements.toString()}
-    `;
+        Analysis: ${analysis}
+      `;
 
   const systemMessage = new SystemMessage(SYSTEM_TEMPLATE);
   const responseMessage = await model.invoke([systemMessage]);
@@ -73,5 +55,5 @@ export const technicalQuestionnaireAgent = async (
     );
   });
 
-  return { qualified: true, questionnaire };
+  return { questionnaire };
 };

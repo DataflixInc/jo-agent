@@ -4,7 +4,7 @@
 import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { SystemMessage } from "@langchain/core/messages";
-import { SelectedResponseFormatType } from "../utils/score_calc";
+import { FormattedQuestionnaireWithVerdictType } from "../utils/score_calc";
 
 export const jdAnalyzerAgent = async (jd: string) => {
   const model = new ChatOpenAI({
@@ -30,21 +30,20 @@ export const jdAnalyzerAgent = async (jd: string) => {
 
 export const questionnaireResponseAnalyzerAgent = async (
   jd: string,
-  qualificationResponses: SelectedResponseFormatType
+  questionnaire: FormattedQuestionnaireWithVerdictType
 ) => {
   const model = new ChatOpenAI({
     model: "o1",
   });
 
   const SYSTEM_TEMPLATE = `
-  You are given a job description and applicants qualifications to create questionnaire.
-  Applicant selected a list of qualifications from a list of necessary and preferred requirements provided to the applicant for the job.
-  The questionnaire is to verify the skills of the applicant from the list of qualifications selected by the applicant.
-  The questionnaire should be multiple-choice questions with ONLY one correct answer.
+  You are given a job description and questionnaire with responses from the applicant. 
+  The questionnaire is created to understand the qualification of the applicant.
+  The questionnaire has multiple-choice questions with ONLY one correct answer.
 
   You have the following tasks.
     1. Analyze the job description.
-    2. Use the qualification list selected by the applicant to create a questionnaire.
+    2. Analyze the responses from the applicant.
     3. Based on the analysis, provide a detailed summary about the technical skills and qualification of the applicant.
     The summary is for the fellow team member to understand the technical skills and qualification of the applicant 
     to generate technical questions for the applicant.
@@ -56,6 +55,7 @@ export const questionnaireResponseAnalyzerAgent = async (
     
     Job Description: ${jd}
     
+    Questionnaire: ${questionnaire.toString()}
     `;
 
   const systemMessage = new SystemMessage(SYSTEM_TEMPLATE);

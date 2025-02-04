@@ -1,41 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormattedQuestionObject = exports.qualificationChecker = exports.SelectedResponseFormat = void 0;
+exports.formattedQuestionnaireWithResponse = exports.FormattedQuestionnaireWithVerdict = exports.FormattedQuestionObject = exports.qualificationChecker = exports.QuestionnaireWithResponse = void 0;
 const qa_agent_1 = require("../agents/qa-agent");
 const zod_1 = require("zod");
 const qa_agent_2 = require("../agents/qa-agent");
 const QuestionObjectWithResponse = qa_agent_1.QuestionObject.extend({
     response: zod_1.z.string().describe("Response to the question"),
 });
-exports.SelectedResponseFormat = qa_agent_2.ResponseFormatter.extend({
-    selected_necessary_requirements: zod_1.z
-        .array(zod_1.z.string())
-        .describe("List of selected necessary requirements"),
-    selected_preferred_requirements: zod_1.z
-        .array(zod_1.z.string())
-        .describe("List of selected preferred requirements"),
+exports.QuestionnaireWithResponse = qa_agent_2.ResponseFormatter.extend({
+    questionnaire: zod_1.z.object({
+        question1: QuestionObjectWithResponse,
+        question2: QuestionObjectWithResponse,
+        question3: QuestionObjectWithResponse,
+        question4: QuestionObjectWithResponse,
+        question5: QuestionObjectWithResponse,
+    }),
 });
-const qualificationChecker = (selectedResponse) => {
-    // If the selected necessary requirements length is greater than 50% of the necessary requirements, return true
-    const necessaryRequirements = selectedResponse.necessary_requirements;
-    const selectedNecessaryRequirements = selectedResponse.selected_necessary_requirements;
-    const necessaryRequirementsLength = necessaryRequirements.length;
-    const selectedNecessaryRequirementsLength = selectedNecessaryRequirements.length;
-    const necessaryRequirementsPercentage = Math.floor((selectedNecessaryRequirementsLength / necessaryRequirementsLength) * 100);
-    // If the selected preferred requirements length is greater than 50% of the preferred requirements, return true
-    const preferredRequirements = selectedResponse.preferred_requirements;
-    const selectedPreferredRequirements = selectedResponse.selected_preferred_requirements;
-    const preferredRequirementsLength = preferredRequirements.length;
-    const selectedPreferredRequirementsLength = selectedPreferredRequirements.length;
-    const preferredRequirementsPercentage = Math.floor((selectedPreferredRequirementsLength / preferredRequirementsLength) * 100);
-    // if both necessary and preferred requirements are greater than 50%, return true
-    if (necessaryRequirementsPercentage >= 50 &&
-        preferredRequirementsPercentage >= 50) {
-        return true;
-    }
-    else {
-        return false;
-    }
+const qualificationChecker = ({ questionnaire, }) => {
+    let score = 0;
+    // calculate the score
+    Object.values(questionnaire).forEach((questionObject) => {
+        if (questionObject.answer === questionObject.response) {
+            score += 1;
+        }
+    });
+    // if score percentage is greater than 70% return true
+    const isQualified = score / 5 > 0.7;
+    return isQualified;
 };
 exports.qualificationChecker = qualificationChecker;
 exports.FormattedQuestionObject = zod_1.z.object({
@@ -44,4 +35,66 @@ exports.FormattedQuestionObject = zod_1.z.object({
     answer: zod_1.z.string().describe("Answer to the question"),
     verdict: zod_1.z.enum(["Correct", "Incorrect"]).describe("Verdict of the response"),
 });
+exports.FormattedQuestionnaireWithVerdict = qa_agent_2.ResponseFormatter.extend({
+    questionnaire: zod_1.z.object({
+        question1: exports.FormattedQuestionObject,
+        question2: exports.FormattedQuestionObject,
+        question3: exports.FormattedQuestionObject,
+        question4: exports.FormattedQuestionObject,
+        question5: exports.FormattedQuestionObject,
+    }),
+});
+const formattedQuestionnaireWithResponse = ({ questionnaire, }) => {
+    const formattedQuestionnaire = {
+        questionnaire: {
+            question1: {
+                question: questionnaire["question1"].question,
+                response: questionnaire["question1"].response,
+                answer: questionnaire["question1"].answer,
+                verdict: questionnaire["question1"].response ===
+                    questionnaire["question1"].answer
+                    ? "Correct"
+                    : "Incorrect",
+            },
+            question2: {
+                question: questionnaire["question2"].question,
+                response: questionnaire["question2"].response,
+                answer: questionnaire["question2"].answer,
+                verdict: questionnaire["question2"].response ===
+                    questionnaire["question2"].answer
+                    ? "Correct"
+                    : "Incorrect",
+            },
+            question3: {
+                question: questionnaire["question3"].question,
+                response: questionnaire["question3"].response,
+                answer: questionnaire["question3"].answer,
+                verdict: questionnaire["question3"].response ===
+                    questionnaire["question3"].answer
+                    ? "Correct"
+                    : "Incorrect",
+            },
+            question4: {
+                question: questionnaire["question4"].question,
+                response: questionnaire["question4"].response,
+                answer: questionnaire["question4"].answer,
+                verdict: questionnaire["question4"].response ===
+                    questionnaire["question4"].answer
+                    ? "Correct"
+                    : "Incorrect",
+            },
+            question5: {
+                question: questionnaire["question5"].question,
+                response: questionnaire["question5"].response,
+                answer: questionnaire["question5"].answer,
+                verdict: questionnaire["question5"].response ===
+                    questionnaire["question5"].answer
+                    ? "Correct"
+                    : "Incorrect",
+            },
+        },
+    };
+    return formattedQuestionnaire;
+};
+exports.formattedQuestionnaireWithResponse = formattedQuestionnaireWithResponse;
 //# sourceMappingURL=score_calc.js.map

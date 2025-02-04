@@ -13,8 +13,15 @@ export const QuestionObject = z.object({
 });
 
 export const ResponseFormatter = z.object({
-  necessary_requirements: z.array(z.string()).describe("List of questions"),
-  preferred_requirements: z.array(z.string()).describe("List of questions"),
+  questionnaire: z
+    .object({
+      question1: QuestionObject,
+      question2: QuestionObject,
+      question3: QuestionObject,
+      question4: QuestionObject,
+      question5: QuestionObject,
+    })
+    .describe("List of questions"),
 });
 
 // Create type of ResponseFormatter
@@ -31,9 +38,13 @@ const qaAgent = async (jd: string) => {
   You are given a Job description that an applicant is applying for. 
   You have the following tasks.
     1. From the job description, analyze the responsibilities and qualifications required for the job.
-    2. Make a list of necessary requirements that are necessary for the job.
-    3. Make a list of preferred requirements that are preferred for the job.
-    4. List items should only contain name labels of the requirement for an applicant to select. Do not add any extra information.
+    2. Create a questionnaire that will help you understand if the applicants can fulfill the responsibilities and qualifications.
+    3. The questionnaire should not have technical questions. 
+    4. The questionnaire should have multiple-choice questions with ONLY one correct answer.
+    5. Every choice should be RELEVANT and equally close to other options.
+    6. The correct answer should be provided for each question.
+    7. The questionnaire should have EXACTLY 5 questions.
+    8. Do not add optoin A, B, C, D or 1, 2, 3, 4 to the options.
     
     Job Description: ${jd}
     `;
@@ -41,7 +52,15 @@ const qaAgent = async (jd: string) => {
   const systemMessage = new SystemMessage(SYSTEM_TEMPLATE);
   const responseMessage = await model.invoke([systemMessage]);
 
-  return responseMessage;
+  // randomise the order of options for each question
+  const questionnaire = responseMessage.questionnaire;
+  Object.values(questionnaire).forEach((questionObject) => {
+    questionObject.options = questionObject.options.sort(
+      () => 0.5 - Math.random()
+    );
+  });
+
+  return { questionnaire };
 };
 
 export default qaAgent;
