@@ -54,6 +54,8 @@ app.post("/qa-responses", async (req: Request, res: Response) => {
       qualificationQuestions,
       technicalQuestions
     );
+
+    res.send("Email sent successfully").status(200);
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal server error");

@@ -66,6 +66,7 @@ Jo by Dataflix
     };
 
     await sendGridEmailClient.send(msg);
+    return;
   } catch (error) {
     console.log("Error sending email");
     console.log({ error });
