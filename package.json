@@ -15,6 +15,7 @@
     "@langchain/core": "^0.3.36",
     "@langchain/langgraph": "^0.2.42",
     "@langchain/openai": "^0.4.2",
+    "@sendgrid/mail": "^8.1.4",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

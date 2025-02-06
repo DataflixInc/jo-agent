@@ -13,6 +13,7 @@ const fetchHtml = async (url: string): Promise<string> => {
 };
 
 type Response = {
+  jobTitle: string;
   jobDescription: string;
 };
 
@@ -24,11 +25,13 @@ export const scrapper = async (url: string): Promise<Response> => {
       $(".jp-sidebar-primary-btn").remove();
       $(".jp-footer-primary-btn").remove();
       $(".jp-view-jobs-btn-sml").remove();
+      let jobTitle = $(".jp-header h1:first").text();
       let description = $(".jp-view").text();
       description = description.replace(/\n/g, "");
       description = description.replace(/ {2,}/g, "\n");
 
       return {
+        jobTitle,
         jobDescription: description,
       };
     } else {
