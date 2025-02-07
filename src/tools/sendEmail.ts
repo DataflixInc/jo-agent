@@ -49,16 +49,11 @@ Hello team,
 
 A new application for  ${jobTitle} has been submitted.
 Applicant details:
-  Name: ${name}
-  Email: ${email}
-  LinkedIn URL: ${linkedInURL}
+Name: ${name}
+Email: ${email}
+LinkedIn URL: ${linkedInURL}
 
-  Applicant has answered the following quiz:
-  Qualification Questions and Responses: 
-  ${convertJSONWithSubTreesToListFormatText(qualificationQuestions)}
-
-  Technical Questions and Responses: 
-  ${convertJSONWithSubTreesToListFormatText(technicalQuestions)}
+${responseFormatter(qualificationQuestions, technicalQuestions)}
 
 Regards,
 Jo by Dataflix
@@ -74,23 +69,64 @@ Jo by Dataflix
   }
 };
 
-export const convertJSONWithSubTreesToListFormatText = (json: any): any => {
-  // Create an empty list to store the converted text.
-  const list = [];
+const responseFormatter = (
+  qualificationQuestions: ResponsesType,
+  technicalQuestions: ResponsesType
+) => {
+  const formattedQualificationQuestions = Object.keys(
+    qualificationQuestions
+  ).map((key) => {
+    const question = qualificationQuestions[key as keyof ResponsesType];
+    return `
+${key}: ${question.question}
+1: ${question.options[0]}
+2: ${question.options[1]}
+3: ${question.options[2]}
+4: ${question.options[3]}
+Answer: ${question.answer} 
+${question.response === question.answer ? "Correct" : "Incorrect"}
+`;
+  });
 
-  // Iterate over the object's properties and add them to the list.
-  for (const property in json) {
-    // If the property is an object, recursively convert it to list format text.
-    if (typeof json[property] === "object") {
-      list.push(`${convertJSONWithSubTreesToListFormatText(json[property])}`);
-    } else {
-      list.push(`- ${property}: ${json[property]}`);
+  const formattedTechnicalQuestions = Object.keys(technicalQuestions).map(
+    (key) => {
+      const question = technicalQuestions[key as keyof ResponsesType];
+      return `
+${key}: ${question.question}
+1: ${question.options[0]}
+2: ${question.options[1]}
+3: ${question.options[2]}
+4: ${question.options[3]}
+Answer: ${question.answer}
+${question.response === question.answer ? "Correct" : "Incorrect"}
+`;
     }
-  }
+  );
 
-  // Join the list items into a single string, separated by newlines.
-  const text = `${list.join("\n")}`;
+  // Calculate the total number of correct answers for qualification and technical questions
+  const correctQualificationAnswers = Object.keys(
+    qualificationQuestions
+  ).filter((key) => {
+    const question = qualificationQuestions[key as keyof ResponsesType];
+    return question.response === question.answer;
+  }).length;
 
-  // Return the converted text.
-  return text;
+  const correctTechnicalAnswers = Object.keys(technicalQuestions).filter(
+    (key) => {
+      const question = technicalQuestions[key as keyof ResponsesType];
+      return question.response === question.answer;
+    }
+  ).length;
+
+  return `
+Qualification Questions and Responses:
+${formattedQualificationQuestions.join("\n")}
+Technical Questions and Responses:
+${formattedTechnicalQuestions.join("\n")}
+
+Total correct qualification answers: ${correctQualificationAnswers}/5
+
+Total correct technical answers: ${correctTechnicalAnswers}/5
+
+`;
 };
