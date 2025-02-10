@@ -79,21 +79,22 @@ const responseFormatter = (
     const question = qualificationQuestions[key as keyof ResponsesType];
     const questionNumber = key.replace("question", "Q");
     return `
-  ${questionNumber}: ${question.question}
-  1: ${question.options[0]}
-  2: ${question.options[1]}
-  3: ${question.options[2]}
-  4: ${question.options[3]}
-  Answer: ${question.answer} 
-  ${question.response === question.answer ? "Correct" : "Incorrect"}
-  `;
+${questionNumber}: ${question.question}
+1: ${question.options[0]}
+2: ${question.options[1]}
+3: ${question.options[2]}
+4: ${question.options[3]}
+Answer: ${question.answer} 
+${question.response === question.answer ? "Correct" : "Incorrect"}
+`;
   });
 
   const formattedTechnicalQuestions = Object.keys(technicalQuestions).map(
     (key) => {
       const question = technicalQuestions[key as keyof ResponsesType];
+      const questionNumber = key.replace("question", "Q");
       return `
-${key}: ${question.question}
+${questionNumber}: ${question.question}
 1: ${question.options[0]}
 2: ${question.options[1]}
 3: ${question.options[2]}
@@ -121,11 +122,11 @@ ${question.response === question.answer ? "Correct" : "Incorrect"}
 
   return `
 Qualification Questions and Responses:
-${formattedQualificationQuestions.join("\n")}
+${formattedQualificationQuestions.join("")}
 Technical Questions and Responses:
-${formattedTechnicalQuestions.join("\n")}
-Total correct qualification answers: ${correctQualificationAnswers}/5
-Total correct technical answers: ${correctTechnicalAnswers}/5
+${formattedTechnicalQuestions.join("")}
+Correct Functional Responses: ${correctQualificationAnswers}/5
+Correct Technical Responses: ${correctTechnicalAnswers}/5
 
 
 
