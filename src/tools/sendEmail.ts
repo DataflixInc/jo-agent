@@ -77,15 +77,16 @@ const responseFormatter = (
     qualificationQuestions
   ).map((key) => {
     const question = qualificationQuestions[key as keyof ResponsesType];
+    const questionNumber = key.replace("question", "Q");
     return `
-${key}: ${question.question}
-1: ${question.options[0]}
-2: ${question.options[1]}
-3: ${question.options[2]}
-4: ${question.options[3]}
-Answer: ${question.answer} 
-${question.response === question.answer ? "Correct" : "Incorrect"}
-`;
+  ${questionNumber}: ${question.question}
+  1: ${question.options[0]}
+  2: ${question.options[1]}
+  3: ${question.options[2]}
+  4: ${question.options[3]}
+  Answer: ${question.answer} 
+  ${question.response === question.answer ? "Correct" : "Incorrect"}
+  `;
   });
 
   const formattedTechnicalQuestions = Object.keys(technicalQuestions).map(
@@ -123,10 +124,11 @@ Qualification Questions and Responses:
 ${formattedQualificationQuestions.join("\n")}
 Technical Questions and Responses:
 ${formattedTechnicalQuestions.join("\n")}
-
 Total correct qualification answers: ${correctQualificationAnswers}/5
-
 Total correct technical answers: ${correctTechnicalAnswers}/5
+
+
+
 
 `;
 };
