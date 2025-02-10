@@ -31,7 +31,7 @@ export type TechnicalResponseFormatterType = z.infer<
 
 export const technicalQuestionnaireAgent = async (jobDescription: string) => {
   const model = new ChatOpenAI({
-    model: "o1",
+    model: "o3-mini",
   }).withStructuredOutput(TechnicalResponseFormatter, {
     name: "questionnaire",
   });

@@ -31,7 +31,7 @@ export type QualificationResponseFormatterType = z.infer<
 
 export const qaAgent = async (jd: string) => {
   const model = new ChatOpenAI({
-    model: "o1",
+    model: "o3-mini",
   }).withStructuredOutput(QualificationResponseFormatter, {
     name: "questionnaire",
   });
