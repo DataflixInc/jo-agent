@@ -37,6 +37,7 @@ export const sendEmailToCareersTeam = async (
               "bhargavr@dataflix.com",
               "mounikap@dataflix.com",
               "preethamv@dataflix.com",
+              "dheeraj@dataflix.com",
             ]
           : "careers@dataflix.com",
       from: {
