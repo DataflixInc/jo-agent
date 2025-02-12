@@ -42,6 +42,10 @@ app.post("/qa-responses", async (req: Request, res: Response) => {
       email,
       linkedInURL,
       jobTitle,
+      location,
+      total_years_of_experience,
+      relevant_years_of_experience,
+      full_time_from_office,
       qualificationQuestions,
       technicalQuestions,
     } = body;
@@ -51,6 +55,10 @@ app.post("/qa-responses", async (req: Request, res: Response) => {
       email,
       jobTitle,
       linkedInURL,
+      location,
+      total_years_of_experience,
+      relevant_years_of_experience,
+      full_time_from_office,
       qualificationQuestions,
       technicalQuestions
     );

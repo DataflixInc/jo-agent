@@ -1,5 +1,6 @@
 import sendGridEmailClient, { MailDataRequired } from "@sendgrid/mail";
 import dotenv from "dotenv";
+import { analyzeResponse } from "../agents/analyzer";
 
 dotenv.config();
 
@@ -24,11 +25,23 @@ export const sendEmailToCareersTeam = async (
   email: string,
   jobTitle: string,
   linkedInURL: string,
+  location: string,
+  total_years_of_experience: string,
+  relevant_years_of_experience: string,
+  full_time_from_office: string,
   qualificationQuestions: ResponsesType,
   technicalQuestions: ResponsesType
 ) => {
   try {
     sendGridEmailClient.setApiKey(process.env.SENDGRID_API_KEY!);
+
+    const { qualificationScore, technicalScore, text } = responseFormatter(
+      qualificationQuestions,
+      technicalQuestions
+    );
+
+    // Analyze the response
+    const responseAnalysis = await analyzeResponse(jobTitle, text);
 
     const msg: MailDataRequired = {
       to:
@@ -41,23 +54,58 @@ export const sendEmailToCareersTeam = async (
           : "careers@dataflix.com",
       from: {
         email: "no-reply@dataflix.com",
-        name: "Jo by Dataflix",
+        name: "Dataflix Jo",
       },
-      subject: `New Application - ${jobTitle}`,
-      text: `
-Hello team,
+      subject: `Pre-Screening by Jo: ${jobTitle}`,
+      content: [
+        {
+          type: "text/html",
+          value: `
+<div style="background-color: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 16px; max-width: 600px; margin: 16px auto; font-family: Arial, sans-serif;">
+  <p style="margin: 0 0 16px 0;">Hello team,</p>
 
-A new application for  ${jobTitle} has been submitted.
-Applicant details:
-Name: ${name}
-Email: ${email}
-LinkedIn URL: ${linkedInURL}
+  <p style="margin: 0 0 16px 0;">
+    I have pre-screened a potential new hire for the role: 
+    <strong>Azure Cloud Engineer - AI, Multi-Agent Systems, and Security</strong>.
+  </p>
 
-${responseFormatter(qualificationQuestions, technicalQuestions)}
+  <div style="margin-bottom: 16px;">
+    <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Applicant Summary</p>
+    <div style="margin: 4px 0;">Name: ${name}</div>
+    <div style="margin: 4px 0;">Email: ${email}</div>
+    <div style="margin: 4px 0;">LinkedIn URL: ${linkedInURL}</div>
+    <div style="margin: 4px 0;">Date: ${new Date().toLocaleDateString()}</div>
+    <div style="margin: 4px 0;">Time: ${new Date().toLocaleTimeString()}</div>
+    <div style="margin: 4px 0;">Location: ${location.toString()} </div>
+    <div style="margin: 4px 0;">Total Years of Experience: ${total_years_of_experience.toString()} </div>
+    <div style="margin: 4px 0;">Relevant Years of Experience: ${relevant_years_of_experience.toString()}</div>
+    <div style="margin: 4px 0;">Would you be able to work full-time from the office? ${
+      full_time_from_office ? "Yes" : "No"
+    }</div>
+  </div>
 
-Regards,
-Jo by Dataflix
+  <div style="margin-bottom: 16px;">
+    <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Scoring &amp; Assessment</p>
+    <div style="margin: 4px 0;">Functional Score: ${qualificationScore}</div>
+    <div style="margin: 4px 0;">Technical Score: ${technicalScore}</div>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <p style="font-weight: bold; margin: 0 0 8px 0;">Assessment</p>
+    <div>${responseAnalysis.text}</div>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    ${text}
+  </div>
+
+  <div style="margin: 0 0 4px 0;">Thanks,</div>
+  <div>Jo</div>
+</div>
+
 `,
+        },
+      ],
     };
 
     await sendGridEmailClient.send(msg);
@@ -69,6 +117,29 @@ Jo by Dataflix
   }
 };
 
+const questionBlock = (question: QuestionObject, questionNumber: string) => {
+  return `
+<div style="background-color: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 16px; max-width: 500px; margin: 16px auto; font-family: Arial, sans-serif;">
+  <p style="font-weight: bold; font-size: 16px; margin-bottom: 12px;">
+    ${questionNumber}: ${question.question}
+  </p>
+  <ol style="list-style-type: decimal; padding-left: 20px; margin-bottom: 16px;">
+    ${question.options
+      .map((option) => `<li style="margin-bottom: 8px;">${option}</li>`)
+      .join("")}
+  </ol>
+  <div style="font-weight: bold; margin-bottom: 8px;">Answer: ${
+    question.answer
+  }</div>
+  <div style="color: ${
+    question.response === question.answer ? "#28a745" : "#dc3545"
+  }; font-weight: bold;">
+    ${question.response === question.answer ? "Correct" : "Incorrect"}
+  </div>
+</div>
+`;
+};
+
 const responseFormatter = (
   qualificationQuestions: ResponsesType,
   technicalQuestions: ResponsesType
@@ -78,30 +149,14 @@ const responseFormatter = (
   ).map((key) => {
     const question = qualificationQuestions[key as keyof ResponsesType];
     const questionNumber = key.replace("question", "Q");
-    return `
-${questionNumber}: ${question.question}
-1: ${question.options[0]}
-2: ${question.options[1]}
-3: ${question.options[2]}
-4: ${question.options[3]}
-Answer: ${question.answer} 
-${question.response === question.answer ? "Correct" : "Incorrect"}
-`;
+    return questionBlock(question, questionNumber);
   });
 
   const formattedTechnicalQuestions = Object.keys(technicalQuestions).map(
     (key) => {
       const question = technicalQuestions[key as keyof ResponsesType];
       const questionNumber = key.replace("question", "Q");
-      return `
-${questionNumber}: ${question.question}
-1: ${question.options[0]}
-2: ${question.options[1]}
-3: ${question.options[2]}
-4: ${question.options[3]}
-Answer: ${question.answer}
-${question.response === question.answer ? "Correct" : "Incorrect"}
-`;
+      return questionBlock(question, questionNumber);
     }
   );
 
@@ -120,16 +175,15 @@ ${question.response === question.answer ? "Correct" : "Incorrect"}
     }
   ).length;
 
-  return `
-Qualification Questions and Responses:
+  return {
+    qualificationScore: `${correctQualificationAnswers}/5`,
+    technicalScore: `${correctTechnicalAnswers}/5`,
+    text: `
+<p><b>Functional Questions and Responses:</b></p>
 ${formattedQualificationQuestions.join("")}
-Technical Questions and Responses:
+
+<p><b>Technical Questions and Responses:</b></p>
 ${formattedTechnicalQuestions.join("")}
-Correct Functional Responses: ${correctQualificationAnswers}/5
-Correct Technical Responses: ${correctTechnicalAnswers}/5
-
-
-
-
-`;
+`,
+  };
 };
