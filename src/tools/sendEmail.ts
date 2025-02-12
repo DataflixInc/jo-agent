@@ -73,12 +73,12 @@ export const sendEmailToCareersTeam = async (
     <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Applicant Summary</p>
     <div style="margin: 4px 0;">Name: ${name}</div>
     <div style="margin: 4px 0;">Email: ${email}</div>
-    <div style="margin: 4px 0;">LinkedIn URL: ${linkedInURL}</div>
+    <div style="margin: 4px 0;">LinkedIn profile: ${linkedInURL}</div>
     <div style="margin: 4px 0;">Date: ${new Date().toLocaleDateString()}</div>
     <div style="margin: 4px 0;">Time: ${new Date().toLocaleTimeString()}</div>
     <div style="margin: 4px 0;">Location: ${location.toString()} </div>
-    <div style="margin: 4px 0;">Total Years of Experience: ${total_years_of_experience.toString()} </div>
-    <div style="margin: 4px 0;">Relevant Years of Experience: ${relevant_years_of_experience.toString()}</div>
+    <div style="margin: 4px 0;">What's your total work experience? ${total_years_of_experience.toString()} </div>
+    <div style="margin: 4px 0;">What's your relevant experience? ${relevant_years_of_experience.toString()}</div>
     <div style="margin: 4px 0;">Would you be able to work full-time from the office? ${
       full_time_from_office ? "Yes" : "No"
     }</div>
