@@ -64,8 +64,7 @@ export const sendEmailToCareersTeam = async (
   <p style="margin: 0 0 16px 0;">Hello team,</p>
 
   <p style="margin: 0 0 16px 0;">
-    I have pre-screened a potential new hire for the role: 
-    <strong>Azure Cloud Engineer - AI, Multi-Agent Systems, and Security</strong>.
+    I have pre-screened a potential new hire for the role: <strong>${jobTitle}</strong>.
   </p>
 
   <div style="margin-bottom: 16px;">
@@ -81,8 +80,8 @@ export const sendEmailToCareersTeam = async (
     <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Scoring &amp; Assessment</p>
     <div style="margin: 4px 0;">Functional Score: ${qualificationScore}</div>
     <div style="margin: 4px 0;">Technical Score: ${technicalScore}</div>
-    <div style="margin: 4px 0;">Relevant experience: ${relevant_years_of_experience.toString()}</div>
     <div style="margin: 4px 0;">Total work experience: ${total_years_of_experience.toString()} </div>
+    <div style="margin: 4px 0;">Relevant experience: ${relevant_years_of_experience.toString()}</div>
     <div style="margin: 4px 0;">Open to work from office: ${full_time_from_office}</div>
   </div>
 

@@ -48,6 +48,7 @@ app.post("/qa-responses", async (req: Request, res: Response) => {
       qualificationQuestions,
       technicalQuestions,
     } = body;
+    console.log("body: ", body);
 
     await sendEmailToCareersTeam(
       name,
