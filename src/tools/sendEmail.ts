@@ -25,7 +25,6 @@ export const sendEmailToCareersTeam = async (
   email: string,
   jobTitle: string,
   linkedInURL: string,
-  location: string,
   total_years_of_experience: string,
   relevant_years_of_experience: string,
   full_time_from_office: string,
@@ -76,18 +75,15 @@ export const sendEmailToCareersTeam = async (
     <div style="margin: 4px 0;">LinkedIn profile: ${linkedInURL}</div>
     <div style="margin: 4px 0;">Date: ${new Date().toLocaleDateString()}</div>
     <div style="margin: 4px 0;">Time: ${new Date().toLocaleTimeString()}</div>
-    <div style="margin: 4px 0;">Location: ${location.toString()} </div>
-    <div style="margin: 4px 0;">What's your total work experience? ${total_years_of_experience.toString()} </div>
-    <div style="margin: 4px 0;">What's your relevant experience? ${relevant_years_of_experience.toString()}</div>
-    <div style="margin: 4px 0;">Would you be able to work full-time from the office? ${
-      full_time_from_office ? "Yes" : "No"
-    }</div>
   </div>
 
   <div style="margin-bottom: 16px;">
     <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Scoring &amp; Assessment</p>
     <div style="margin: 4px 0;">Functional Score: ${qualificationScore}</div>
     <div style="margin: 4px 0;">Technical Score: ${technicalScore}</div>
+    <div style="margin: 4px 0;">Relevant experience: ${relevant_years_of_experience.toString()}</div>
+    <div style="margin: 4px 0;">Total work experience: ${total_years_of_experience.toString()} </div>
+    <div style="margin: 4px 0;">Open to work from office: ${full_time_from_office}</div>
   </div>
 
   <div style="margin-bottom: 16px;">
@@ -179,10 +175,10 @@ const responseFormatter = (
     qualificationScore: `${correctQualificationAnswers}/5`,
     technicalScore: `${correctTechnicalAnswers}/5`,
     text: `
-<p><b>Functional Questions and Responses:</b></p>
+<p><b>Functional Questions and Responses</b></p>
 ${formattedQualificationQuestions.join("")}
 
-<p><b>Technical Questions and Responses:</b></p>
+<p><b>Technical Questions and Responses</b></p>
 ${formattedTechnicalQuestions.join("")}
 `,
   };
