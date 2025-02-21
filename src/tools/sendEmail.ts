@@ -25,7 +25,6 @@ export const sendEmailToCareersTeam = async (
   email: string,
   jobTitle: string,
   linkedInURL: string,
-  total_years_of_experience: string,
   relevant_years_of_experience: string,
   full_time_from_office: string,
   qualificationQuestions: ResponsesType,
@@ -80,7 +79,6 @@ export const sendEmailToCareersTeam = async (
     <p style="font-weight: bold; margin: 0 0 8px 0;">Pre-Screen Scoring &amp; Assessment</p>
     <div style="margin: 4px 0;">Functional Score: ${qualificationScore}</div>
     <div style="margin: 4px 0;">Technical Score: ${technicalScore}</div>
-    <div style="margin: 4px 0;">Total work experience: ${total_years_of_experience.toString()} </div>
     <div style="margin: 4px 0;">Relevant experience: ${relevant_years_of_experience.toString()}</div>
     <div style="margin: 4px 0;">Open to work from office: ${full_time_from_office}</div>
   </div>
